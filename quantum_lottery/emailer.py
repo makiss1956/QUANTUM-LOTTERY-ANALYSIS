@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+import os
 import smtplib
 import ssl
 from email.mime.multipart import MIMEMultipart
@@ -24,7 +25,7 @@ log = get_logger("Emailer")
 def send_html(subject: str, html: str, fallback_text: str = "",
               save_to: Optional[Path] = None) -> bool:
     """
-    Αποστολή HTML email μέσω Gmail SMTP.
+    Αποστολή HTML email μέσω Gmail SMTP σε πολλαπλούς αποδέκτες.
     Αν δεν υπάρχει ρύθμιση, αποθηκεύει το HTML τοπικά και επιστρέφει False.
     """
     em = SETTINGS.email
@@ -39,10 +40,22 @@ def send_html(subject: str, html: str, fallback_text: str = "",
         log.warning("Στοιχεία Gmail μη ρυθμισμένα (.env) — η αναφορά αποθηκεύτηκε μόνο τοπικά.")
         return False
 
+    # Συλλογή email από τα Secrets (βασικό + συνεργάτη)
+    recipient_primary = getattr(em, "recipient", None) or os.environ.get("EMAIL_TO", "")
+    recipient_partner = os.environ.get("EMAIL_TO_PARTNER", "")
+
+    # Δημιουργία καθαρής λίστας αποδεκτών (αποφυγή κενών)
+    recipients = [r.strip() for r in [recipient_primary, recipient_partner] if r and r.strip()]
+
+    if not recipients:
+        log.warning("Δεν βρέθηκαν διευθύνσεις email παραληπτών!")
+        return False
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = em.user
-    msg["To"] = em.recipient
+    # Στο πεδίο "To" βάζουμε τους αποδέκτες ενωμένους με κόμμα για την εμφάνιση
+    msg["To"] = ", ".join(recipients)
     msg.attach(MIMEText(fallback_text or "Δες το επισυναπτόμενο HTML.", "plain", "utf-8"))
     msg.attach(MIMEText(html, "html", "utf-8"))
 
@@ -52,8 +65,9 @@ def send_html(subject: str, html: str, fallback_text: str = "",
             server.ehlo()
             server.starttls(context=ctx)
             server.login(em.user, em.app_password)
-            server.sendmail(em.user, [em.recipient], msg.as_string())
-        log.info("Email εστάλη στο %s ✔", em.recipient)
+            # Η συνάρτηση sendmail δέχεται λίστα παραληπτών για να στείλει σε όλους
+            server.sendmail(em.user, recipients, msg.as_string())
+        log.info("Email εστάλη επιτυχώς σε: %s ✔", ", ".join(recipients))
         return True
     except (smtplib.SMTPException, OSError) as exc:
         log.error("Αποτυχία αποστολής email: %s", exc)
