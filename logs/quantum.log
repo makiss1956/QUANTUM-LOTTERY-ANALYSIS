@@ -38,3 +38,9 @@
 2026-11-11 13:50:38 | INFO     | HistoryStore       | Καταχώρηση ιστορικού: prediction
 2026-11-11 13:50:39 | INFO     | Emailer            | Email εστάλη επιτυχώς σε: makiskomiakitis@gmail.com, gianakonax@gmail.com ✔
 2026-11-11 13:50:39 | INFO     | HistoryStore       | Καταχώρηση ιστορικού: email
+2026-11-14 01:31:54 | INFO     | DataFeed           | Το ιστορικό είναι ενημερωμένο (1006 κληρώσεις).
+2026-11-14 01:31:55 | INFO     | QuantumEngine      | Κβαντική κατάσταση |ψ⟩ έτοιμη: 1006 παρατηρήσεις, τρόπος=20.00, τυπική απόκλιση=0.00
+2026-11-14 01:31:55 | INFO     | Predictor          | Πρόβλεψη για 2026-11-17 | Σκελετός Α: (1, 7, 17, 18, 49) +(11, 12) | Σκελετός Β: (16, 20, 34) +5
+2026-11-14 01:31:55 | INFO     | HistoryStore       | Καταχώρηση ιστορικού: prediction
+2026-11-14 01:31:57 | INFO     | Emailer            | Email εστάλη επιτυχώς σε: makiskomiakitis@gmail.com, gianakonax@gmail.com ✔
+2026-11-14 01:31:57 | INFO     | HistoryStore       | Καταχώρηση ιστορικού: email
